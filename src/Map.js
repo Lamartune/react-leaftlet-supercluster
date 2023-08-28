@@ -7,7 +7,7 @@ import ShowCrimes from "./ShowCrimes";
 function Map() {
   const { isLoading, error, data } = useQuery("repoData", () =>
     fetch(
-      "https://data.police.uk/api/crimes-street/all-crime?lat=52.629729&lng=-1.131592&date=2019-10"
+      "https://openapi.izmir.bel.tr/api/ibb/cbs/muhtarliklar"
     ).then((res) => res.json())
   );
 

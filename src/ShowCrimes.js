@@ -5,21 +5,22 @@ import useSupercluster from "use-supercluster";
 import { Marker, useMap } from "react-leaflet";
 
 const icons = {};
-const fetchIcon = (count, size) => {
+
+const cuffs = new L.Icon({
+  iconUrl: "/handcuffs.svg",
+  iconSize: [25, 25]
+});
+
+function fetchIcon(count, size) {
   if (!icons[count]) {
     icons[count] = L.divIcon({
       html: `<div class="cluster-marker" style="width: ${size}px; height: ${size}px;">
         ${count}
-      </div>`,
+      </div>`
     });
   }
   return icons[count];
-};
-
-const cuffs = new L.Icon({
-  iconUrl: "/handcuffs.svg",
-  iconSize: [25, 25],
-});
+}
 
 function ShowCrimes({ data }) {
   const maxZoom = 22;
@@ -27,15 +28,13 @@ function ShowCrimes({ data }) {
   const [zoom, setZoom] = useState(12);
   const map = useMap();
 
-  // get map bounds
   function updateMap() {
-    console.log("updating");
     const b = map.getBounds();
     setBounds([
       b.getSouthWest().lng,
       b.getSouthWest().lat,
       b.getNorthEast().lng,
-      b.getNorthEast().lat,
+      b.getNorthEast().lat
     ]);
     setZoom(map.getZoom());
   }
@@ -44,7 +43,7 @@ function ShowCrimes({ data }) {
     updateMap();
   }, [map]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     updateMap();
   }, [map]);
 
@@ -55,37 +54,32 @@ function ShowCrimes({ data }) {
     };
   }, [map, onMove]);
 
-  const points = data.map((crime) => ({
+  const points = data.onemliyer.map((place) => ({
     type: "Feature",
-    properties: { cluster: false, crimeId: crime.id, category: crime.category },
+    properties: {
+      cluster: false,
+      placeName: place.ADI
+    },
     geometry: {
       type: "Point",
-      coordinates: [
-        parseFloat(crime.location.longitude),
-        parseFloat(crime.location.latitude),
-      ],
-    },
+      coordinates: [place.BOYLAM, place.ENLEM]
+    }
   }));
 
   const { clusters, supercluster } = useSupercluster({
     points: points,
     bounds: bounds,
     zoom: zoom,
-    options: { radius: 75, maxZoom: 17 },
+    options: { radius: 75, maxZoom: 17 }
   });
-
-  console.log(clusters.length);
 
   return (
     <>
       {clusters.map((cluster) => {
-        // every cluster point has coordinates
         const [longitude, latitude] = cluster.geometry.coordinates;
-        // the point may be either a cluster or a crime point
         const { cluster: isCluster, point_count: pointCount } =
           cluster.properties;
 
-        // we have a cluster to render
         if (isCluster) {
           return (
             <Marker
@@ -102,18 +96,17 @@ function ShowCrimes({ data }) {
                     maxZoom
                   );
                   map.setView([latitude, longitude], expansionZoom, {
-                    animate: true,
+                    animate: true
                   });
-                },
+                }
               }}
             />
           );
         }
 
-        // we have a single point (crime) to render
         return (
           <Marker
-            key={`crime-${cluster.properties.crimeId}`}
+            key={`place-${cluster.properties.placeName}`}
             position={[latitude, longitude]}
             icon={cuffs}
           />
