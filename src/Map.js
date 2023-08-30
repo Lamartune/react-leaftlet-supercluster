@@ -18,7 +18,7 @@ function Map() {
   console.log(data);
 
   return (
-    <MapContainer center={[52.6376, -1.135171]} zoom={13}>
+    <MapContainer center={[40.8853665241692, 29.357362144397193]} zoom={11}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
